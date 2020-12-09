@@ -109,6 +109,9 @@ func (app *App) run(c *cli.Context) (err error) {
 		}
 		p = filepath.Join(p, "*")
 		options.Template, err = template.ParseGlob(p)
+		if err != nil {
+			return err
+		}
 	}
 
 	app.bot = tghbot.NewBot(options, client, oauth2.StaticTokenSource(
