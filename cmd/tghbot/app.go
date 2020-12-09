@@ -159,14 +159,14 @@ func (app *App) flags() []cli.Flag {
 		// tg
 		altsrc.NewIntFlag(&cli.IntFlag{
 			Name:     "tg.app_id",
-			Required: false,
+			Required: true,
 			Usage:    "Telegram app ID",
 			Aliases:  []string{"app_id"},
 			EnvVars:  app.getEnvNames("APP_ID"),
 		}),
 		altsrc.NewStringFlag(&cli.StringFlag{
 			Name:     "tg.app_hash",
-			Required: false,
+			Required: true,
 			Usage:    "Telegram app hash",
 			Aliases:  []string{"app_hash"},
 			EnvVars:  app.getEnvNames("APP_HASH"),
