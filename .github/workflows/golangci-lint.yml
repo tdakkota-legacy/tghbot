@@ -17,10 +17,6 @@ jobs:
       - name: Check out code into the Go module directory
         uses: actions/checkout@v2
 
-      - name: Go generate
-        run: |
-          go generate ./...
-
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v2.3.0
         with:
