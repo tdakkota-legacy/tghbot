@@ -134,7 +134,7 @@ func (app *App) flags() []cli.Flag {
 		// bot
 		altsrc.NewDurationFlag(&cli.DurationFlag{
 			Name:    "bot.poll_timeout",
-			Value:   60 * time.Second,
+			Value:   10 * time.Second,
 			Usage:   "Github Events API polling timeout",
 			Aliases: []string{"poll_timeout"},
 		}),
@@ -156,14 +156,14 @@ func (app *App) flags() []cli.Flag {
 		// tg
 		altsrc.NewIntFlag(&cli.IntFlag{
 			Name:     "tg.app_id",
-			Required: true,
+			Required: false,
 			Usage:    "Telegram app ID",
 			Aliases:  []string{"app_id"},
 			EnvVars:  app.getEnvNames("APP_ID"),
 		}),
 		altsrc.NewStringFlag(&cli.StringFlag{
 			Name:     "tg.app_hash",
-			Required: true,
+			Required: false,
 			Usage:    "Telegram app hash",
 			Aliases:  []string{"app_hash"},
 			EnvVars:  app.getEnvNames("APP_HASH"),
