@@ -22,4 +22,4 @@ jobs:
           go generate ./...
 
       - name: Super-Linter
-        uses: github/super-linter@v3.14.0
+        uses: github/super-linter@v3.14.3
