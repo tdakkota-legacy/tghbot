@@ -17,6 +17,7 @@ type Listener struct {
 
 	handler     Handler
 	pollTimeout time.Duration
+	lastUpdate  time.Time
 	log         *zap.Logger
 }
 
@@ -38,6 +39,7 @@ func NewListener(gh *github.Client, storage storage.Storage, handler Handler, op
 		storage:     storage,
 		handler:     handler,
 		pollTimeout: 10 * time.Second,
+		lastUpdate:  time.Now(),
 	}
 
 	for _, op := range opts {
@@ -53,12 +55,12 @@ func NewListener(gh *github.Client, storage storage.Storage, handler Handler, op
 
 func (s Listener) Run(ctx context.Context) error {
 	timer := time.NewTimer(s.pollTimeout)
-	lastUpdate := time.Now()
 
 	s.log.Info("running Github API event listener")
 	defer func() {
 		s.log.Info("stopping Github API event listener")
 	}()
+
 	for {
 		select {
 		case <-timer.C:
@@ -71,34 +73,42 @@ func (s Listener) Run(ctx context.Context) error {
 
 			for _, m := range mappings {
 				repo := m.Repo
-				events, _, err := s.gh.Activity.ListRepositoryEvents(ctx, repo.Owner, repo.Name, nil)
+				events, resp, err := s.gh.Activity.ListRepositoryEvents(ctx, repo.Owner, repo.Name, nil)
 				if err != nil {
 					return err
 				}
 
-				err = s.handleEvents(ctx, m, lastUpdate, events)
+				if resp.Header.Get("X-From-Cache") == "1" {
+					s.log.Info("skipping due to events got from cache")
+					continue
+				}
+
+				err = s.handleEvents(ctx, m, events)
 				if err != nil {
 					return err
 				}
 			}
-
-			lastUpdate = time.Now()
 		case <-ctx.Done():
 			return nil
 		}
 	}
 }
 
-func (s Listener) handleEvents(ctx context.Context, m storage.Mapping, lastUpdate time.Time, events []*github.Event) error {
-	for _, event := range events {
-		if event.GetCreatedAt().Before(lastUpdate) {
-			continue
-		}
+func (s *Listener) handleEvents(ctx context.Context, m storage.Mapping, events []*github.Event) error {
+	c := 0
 
-		s.log.With(
+	for _, event := range events {
+		l := s.log.With(
 			zap.String("repo", m.Repo.ToGithubURL()),
 			zap.String("event_type", event.GetType()),
-		).Info("handling event")
+		)
+		if event.GetCreatedAt().Before(s.lastUpdate) {
+			continue
+		}
+		s.lastUpdate = time.Now().Add(s.pollTimeout * -1).Add(time.Second)
+		c++
+
+		l.Info("handling event")
 		p, err := event.ParsePayload()
 		if err != nil {
 			return err
@@ -150,6 +160,10 @@ func (s Listener) handleEvents(ctx context.Context, m storage.Mapping, lastUpdat
 				return s.handler(ctx, e)
 			}
 		}
+	}
+
+	if c == 0 {
+		s.log.Info("No new events")
 	}
 
 	return nil

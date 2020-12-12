@@ -46,23 +46,6 @@ func (b *Bot) sendTemplate(ctx context.Context, peer storage.Peer, tmplName stri
 		return errInvalidPeerType
 	}
 
-	var rply tg.ReplyMarkupClass
-	if len(payload.Links) > 0 {
-		rply := &tg.ReplyKeyboardMarkup{
-			Resize: true,
-		}
-		for _, link := range payload.Links {
-			rply.Rows = append(rply.Rows, tg.KeyboardButtonRow{
-				Buttons: []tg.KeyboardButtonClass{
-					&tg.KeyboardButtonUrl{
-						Text: link.Name,
-						URL:  link.URL,
-					},
-				},
-			})
-		}
-	}
-
 	randomID, err := b.tg.RandInt64()
 	if err != nil {
 		return err
@@ -73,7 +56,21 @@ func (b *Bot) sendTemplate(ctx context.Context, peer storage.Peer, tmplName stri
 		RandomID: randomID,
 		Message:  s.String(),
 	}
-	msg.SetReplyMarkup(rply)
+
+	if len(payload.Links) > 0 {
+		rply := &tg.ReplyInlineMarkup{}
+		for _, link := range payload.Links {
+			rply.Rows = append(rply.Rows, tg.KeyboardButtonRow{
+				Buttons: []tg.KeyboardButtonClass{
+					&tg.KeyboardButtonUrl{
+						Text: link.Name,
+						URL:  link.URL,
+					},
+				},
+			})
+		}
+		msg.SetReplyMarkup(rply)
+	}
 
 	err = b.tg.SendMessage(ctx, msg)
 	if err != nil {
