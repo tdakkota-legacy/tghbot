@@ -1,14 +1,14 @@
 package main
 
 import (
-	"context"
 	"os"
 	"path/filepath"
 	"text/template"
 	"time"
 
-	"github.com/gotd/td/telegram"
 	"github.com/gotd/td/tg"
+
+	"github.com/gotd/td/telegram"
 	"github.com/tdakkota/tghbot/tghbot"
 	"github.com/urfave/cli/v2"
 	"github.com/urfave/cli/v2/altsrc"
@@ -30,14 +30,7 @@ func NewApp() *App {
 	}
 }
 
-func (app *App) handler(ctx context.Context, c telegram.UpdateClient, updates *tg.Updates) error {
-	if app.bot != nil {
-		return app.bot.UpdateHandler(ctx, c, updates)
-	}
-	return nil
-}
-
-func (app *App) createTelegram(c *cli.Context) (*telegram.Client, error) {
+func (app *App) createTelegram(c *cli.Context, dispatcher tg.UpdateDispatcher) (*telegram.Client, error) {
 	logger := app.logger
 
 	sessionDir := ""
@@ -55,20 +48,17 @@ func (app *App) createTelegram(c *cli.Context) (*telegram.Client, error) {
 		return nil, xerrors.Errorf("failed to create session dir: %w", err)
 	}
 
-	client, err := telegram.Dial(c.Context, telegram.Options{
+	client := telegram.NewClient(c.Int("tg.app_id"), c.String("tg.app_hash"), telegram.Options{
 		Logger: logger,
 		SessionStorage: &telegram.FileSessionStorage{
 			Path: filepath.Join(sessionDir, "session.json"),
 		},
-
-		// Grab these from https://my.telegram.org/apps.
-		// Never share it or hardcode!
-		AppID:         c.Int("tg.app_id"),
-		AppHash:       c.String("tg.app_hash"),
-		UpdateHandler: app.handler,
+		UpdateHandler: dispatcher.Handle,
 	})
+
+	err := client.Connect(c.Context)
 	if err != nil {
-		return nil, xerrors.Errorf("failed to dial: %w", err)
+		return nil, xerrors.Errorf("failed to connect: %w", err)
 	}
 
 	auth, err := client.AuthStatus(c.Context)
@@ -93,7 +83,8 @@ func (app *App) createTelegram(c *cli.Context) (*telegram.Client, error) {
 }
 
 func (app *App) run(c *cli.Context) (err error) {
-	client, err := app.createTelegram(c)
+	dispatcher := tg.NewUpdateDispatcher()
+	client, err := app.createTelegram(c, dispatcher)
 	if err != nil {
 		return err
 	}
@@ -117,6 +108,7 @@ func (app *App) run(c *cli.Context) (err error) {
 	app.bot = tghbot.NewBot(options, client, oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: c.String("gh.token")},
 	), tghbot.WithLogger(app.logger))
+	app.bot.SetupDispatcher(dispatcher)
 
 	return app.bot.Run(c.Context)
 }

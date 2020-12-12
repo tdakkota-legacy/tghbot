@@ -67,12 +67,15 @@ func (b *Bot) sendTemplate(ctx context.Context, peer storage.Peer, tmplName stri
 	if err != nil {
 		return err
 	}
-	err = b.tg.SendMessage(ctx, &tg.MessagesSendMessageRequest{
-		Peer:        inputPeer,
-		RandomID:    randomID,
-		Message:     s.String(),
-		ReplyMarkup: rply,
-	})
+
+	msg := &tg.MessagesSendMessageRequest{
+		Peer:     inputPeer,
+		RandomID: randomID,
+		Message:  s.String(),
+	}
+	msg.SetReplyMarkup(rply)
+
+	err = b.tg.SendMessage(ctx, msg)
 	if err != nil {
 		return fmt.Errorf("failed to send message: %w", err)
 	}

@@ -102,35 +102,12 @@ func (b *Bot) Run(ctx context.Context) error {
 	return b.subs.Run(ctx)
 }
 
-func (b *Bot) UpdateHandler(ctx context.Context, c telegram.UpdateClient, updates *tg.Updates) error {
-	// This wll be required to send message back.
-	users := map[int]*tg.User{}
-	for _, u := range updates.Users {
-		user, ok := u.(*tg.User)
-		if !ok {
-			continue
-		}
-		users[user.ID] = user
-	}
+func (b *Bot) SetupDispatcher(dispatcher tg.UpdateDispatcher) {
+	dispatcher.OnNewMessage(func(ctx tg.UpdateContext, update *tg.UpdateNewMessage) error {
+		return b.handleMessage(b.wrapContext(ctx), update)
+	})
 
-	chats := map[int]*tg.Chat{}
-	for _, u := range updates.Chats {
-		chat, ok := u.(*tg.Chat)
-		if !ok {
-			continue
-		}
-		chats[chat.ID] = chat
-	}
-
-	for _, update := range updates.Updates {
-		if err := b.handle(updateContext{
-			Context:      ctx,
-			UpdateClient: c,
-			users:        users,
-			chats:        chats,
-		}, update); err != nil {
-			return err
-		}
-	}
-	return nil
+	dispatcher.OnBotInlineQuery(func(ctx tg.UpdateContext, update *tg.UpdateBotInlineQuery) error {
+		return b.handleInlineQuery(b.wrapContext(ctx), update)
+	})
 }

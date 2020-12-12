@@ -1,7 +1,6 @@
 package tghbot
 
 import (
-	"context"
 	"fmt"
 	"strings"
 
@@ -13,37 +12,27 @@ import (
 )
 
 type updateContext struct {
-	context.Context
-	telegram.UpdateClient
-	users  map[int]*tg.User
-	chats  map[int]*tg.Chat
+	tg.UpdateContext
+	*telegram.Client
 	peer   tg.InputPeerClass
 	fields []zap.Field
 }
 
-func (u *updateContext) Answer(m *tg.MessagesSendMessageRequest) (err error) {
+func (u updateContext) Answer(m *tg.MessagesSendMessageRequest) (err error) {
 	m.Peer = u.peer
 	m.RandomID, err = u.RandInt64()
 	if err != nil {
 		return err
 	}
-	return u.UpdateClient.SendMessage(u, m)
+	return u.Client.SendMessage(u, m)
 }
 
-func (b *Bot) handle(ctx updateContext, update tg.UpdateClass) error {
-	ctx.fields = []zap.Field{
-		zap.String("update_type", fmt.Sprintf("%T", update)),
+func (b *Bot) wrapContext(uctx tg.UpdateContext) updateContext {
+	ctx := updateContext{
+		UpdateContext: uctx,
+		Client:        b.tg,
 	}
-
-	switch u := update.(type) {
-	case *tg.UpdateNewMessage:
-		return b.handleMessage(ctx, u)
-	case *tg.UpdateBotInlineQuery:
-		return b.handleInlineQuery(ctx, u)
-	default:
-		b.log.With(ctx.fields...).Info("Ignoring update")
-	}
-	return nil
+	return ctx
 }
 
 func (b *Bot) handleInlineQuery(ctx updateContext, u *tg.UpdateBotInlineQuery) error {
@@ -69,7 +58,7 @@ func (b *Bot) handleMessage(ctx updateContext, u *tg.UpdateNewMessage) error {
 			UserID: p.UserID,
 		}
 
-		peerName = ctx.users[p.UserID].Username
+		peerName = ctx.Users[p.UserID].Username
 	case *tg.PeerChat:
 		peer.PeerType = storage.Chat
 		peer.ID = p.ChatID
@@ -77,7 +66,7 @@ func (b *Bot) handleMessage(ctx updateContext, u *tg.UpdateNewMessage) error {
 			ChatID: p.ChatID,
 		}
 
-		peerName = ctx.chats[p.ChatID].Title
+		peerName = ctx.Chats[p.ChatID].Title
 	default:
 		b.log.With(ctx.fields...).Info("Ignoring update")
 		return nil
@@ -94,7 +83,7 @@ func (b *Bot) handleMessage(ctx updateContext, u *tg.UpdateNewMessage) error {
 			return nil
 		}
 
-		username = ctx.users[from.UserID].Username
+		username = ctx.Users[from.UserID].Username
 	} else {
 		username = peerName
 	}

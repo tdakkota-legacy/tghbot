@@ -55,7 +55,10 @@ func (s Listener) Run(ctx context.Context) error {
 	timer := time.NewTimer(s.pollTimeout)
 	lastUpdate := time.Now()
 
-	s.log.Info("running GithubAPI event listener")
+	s.log.Info("running Github API event listener")
+	defer func() {
+		s.log.Info("stopping Github API event listener")
+	}()
 	for {
 		select {
 		case <-timer.C:
@@ -88,10 +91,14 @@ func (s Listener) Run(ctx context.Context) error {
 
 func (s Listener) handleEvents(ctx context.Context, m storage.Mapping, lastUpdate time.Time, events []*github.Event) error {
 	for _, event := range events {
-		if event.CreatedAt.Before(lastUpdate) {
+		if event.GetCreatedAt().Before(lastUpdate) {
 			continue
 		}
 
+		s.log.With(
+			zap.String("repo", m.Repo.ToGithubURL()),
+			zap.String("event_type", event.GetType()),
+		).Info("handling event")
 		p, err := event.ParsePayload()
 		if err != nil {
 			return err

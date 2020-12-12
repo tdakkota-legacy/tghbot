@@ -195,10 +195,8 @@ github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UV
 github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81PSLYec5m4=
 github.com/stretchr/testify v1.6.1 h1:hDPOHmpOpP40lSULcqw7IrRb/u7w6RpDC9399XyoNd0=
 github.com/stretchr/testify v1.6.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
-github.com/tdakkota/td v0.7.2-0.20201207170537-f1ebbbd68cc5 h1:k7vJHL095Mfm7P3bm2qVsz8QAMzfXhcVVyMSoJEYSHQ=
-github.com/tdakkota/td v0.7.2-0.20201207170537-f1ebbbd68cc5/go.mod h1:79WWGAdyE+qkD1EjeSppCFd6xMerAtq2rltHr5WYSfc=
-github.com/tdakkota/td v0.7.2-0.20201208193041-50c77200aded h1:ZYKF2hODQYTJ4r1UMc1rF0UmlBC5+wN2BVCF8a0y4Qg=
-github.com/tdakkota/td v0.7.2-0.20201208193041-50c77200aded/go.mod h1:79WWGAdyE+qkD1EjeSppCFd6xMerAtq2rltHr5WYSfc=
+github.com/tdakkota/td v0.7.2-0.20201212044233-fb0462200185 h1:Gi2d0XbrD6zMsvo48PUYKGy3kTB4pzENMRYbLDpOC6o=
+github.com/tdakkota/td v0.7.2-0.20201212044233-fb0462200185/go.mod h1:sBZcELHwzxLeQEdKdPySFG6T1xk5vhxPUAsdlD0a8iY=
 github.com/ugorji/go v1.1.4/go.mod h1:uQMGLiO92mf5W77hV/PUCpI3pbzQx3CRekS0kk+RGrc=
 github.com/ugorji/go/codec v0.0.0-20181204163529-d75b2dcb6bc8/go.mod h1:VFNgLljTbGfSG7qAOspJ7OScBnGdDN/yBr0sguwnwf0=
 github.com/urfave/cli/v2 v2.3.0 h1:qph92Y649prgesehzOrQjdWyxFOp/QVM+6imKHad91M=
