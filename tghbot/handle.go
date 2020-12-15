@@ -182,7 +182,7 @@ func (b *Bot) handleCommand(ctx updateContext, peer storage.Peer, args []string)
 				result.WriteByte('\n')
 			}
 		} else {
-			result.WriteString("Ни найдено ни одной подписки")
+			result.WriteString("Не найдено ни одной подписки\nПример:\n /addrepo https://github.com/gotd/td")
 		}
 
 		return ctx.Answer(&tg.MessagesSendMessageRequest{

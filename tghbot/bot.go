@@ -84,10 +84,8 @@ func NewBot(options Options, tg *telegram.Client, src oauth2.TokenSource, opts .
 
 func (b *Bot) Run(ctx context.Context) error {
 	client := tg.NewClient(b.tg)
-	r, err := client.UsersGetUsers(ctx, &tg.UsersGetUsersRequest{
-		ID: []tg.InputUserClass{
-			&tg.InputUserSelf{},
-		},
+	r, err := client.UsersGetUsers(ctx, []tg.InputUserClass{
+		&tg.InputUserSelf{},
 	})
 	if err != nil {
 		return err

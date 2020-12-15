@@ -4,7 +4,7 @@ go 1.15
 
 require (
 	github.com/google/go-github/v33 v33.0.0
-	github.com/gotd/td v0.7.1
+	github.com/gotd/td v0.9.1
 	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79
 	github.com/stretchr/testify v1.6.1
 	github.com/urfave/cli/v2 v2.3.0
@@ -12,5 +12,3 @@ require (
 	golang.org/x/oauth2 v0.0.0-20180821212333-d2e6202438be
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1
 )
-
-replace github.com/gotd/td v0.7.1 => github.com/tdakkota/td v0.7.2-0.20201212044233-fb0462200185
