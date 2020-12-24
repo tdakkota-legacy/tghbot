@@ -6,9 +6,8 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/gotd/td/tg"
-
 	"github.com/gotd/td/telegram"
+	"github.com/gotd/td/tg"
 	"github.com/tdakkota/tghbot/tghbot"
 	"github.com/urfave/cli/v2"
 	"github.com/urfave/cli/v2/altsrc"
@@ -68,7 +67,7 @@ func (app *App) createTelegram(c *cli.Context, dispatcher tg.UpdateDispatcher) (
 
 	logger.With(zap.Bool("authorized", auth.Authorized)).Info("Auth status")
 	if !auth.Authorized {
-		if err := client.BotLogin(c.Context, c.String("tg.bot_token")); err != nil {
+		if err := client.AuthBot(c.Context, c.String("tg.bot_token")); err != nil {
 			return nil, xerrors.Errorf("failed to perform bot login: %w", err)
 		}
 		logger.Info("Bot login ok")

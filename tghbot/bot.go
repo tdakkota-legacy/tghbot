@@ -83,18 +83,13 @@ func NewBot(options Options, tg *telegram.Client, src oauth2.TokenSource, opts .
 }
 
 func (b *Bot) Run(ctx context.Context) error {
-	client := tg.NewClient(b.tg)
-	r, err := client.UsersGetUsers(ctx, []tg.InputUserClass{
-		&tg.InputUserSelf{},
-	})
+	me, err := b.tg.Self(ctx)
 	if err != nil {
 		return err
 	}
-	if len(r) > 0 {
-		me, ok := r[0].(*tg.User)
-		if ok {
-			b.log.With(zap.String("username", me.Username)).Info("getMe")
-		}
+	b.log.With(zap.String("username", me.Username)).Info("getMe")
+	if !me.Bot {
+		b.log.Warn("expected that current user is bot")
 	}
 
 	return b.subs.Run(ctx)
