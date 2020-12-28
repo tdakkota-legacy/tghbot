@@ -87,6 +87,9 @@ func (app *App) run(c *cli.Context) (err error) {
 	if err != nil {
 		return err
 	}
+	defer func() {
+		_ = client.Close()
+	}()
 
 	options := tghbot.Options{
 		PollTimeout: c.Duration("bot.poll_timeout"),
