@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/tdakkota/tghbot/tghbot/storage"
-
 	"github.com/gotd/td/telegram"
 	"github.com/gotd/td/tg"
 	"go.uber.org/zap"
+
+	"github.com/tdakkota/tghbot/tghbot/storage"
 )
 
 type updateContext struct {

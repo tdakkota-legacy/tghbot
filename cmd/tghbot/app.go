@@ -1,20 +1,23 @@
 package main
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 	"text/template"
 	"time"
 
+	"github.com/gotd/td/session"
 	"github.com/gotd/td/telegram"
 	"github.com/gotd/td/tg"
-	"github.com/tdakkota/tghbot/tghbot"
 	"github.com/urfave/cli/v2"
 	"github.com/urfave/cli/v2/altsrc"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"golang.org/x/oauth2"
 	"golang.org/x/xerrors"
+
+	"github.com/tdakkota/tghbot/tghbot"
 )
 
 type App struct {
@@ -29,7 +32,9 @@ func NewApp() *App {
 	}
 }
 
-func (app *App) createTelegram(c *cli.Context, dispatcher tg.UpdateDispatcher) (*telegram.Client, error) {
+type ClientCallback = func(c *cli.Context, client *telegram.Client) error
+
+func (app *App) createTelegram(c *cli.Context, dispatcher tg.UpdateDispatcher, cb ClientCallback) error {
 	logger := app.logger
 
 	sessionDir := ""
@@ -44,75 +49,61 @@ func (app *App) createTelegram(c *cli.Context, dispatcher tg.UpdateDispatcher) (
 		}
 	}
 	if err := os.MkdirAll(sessionDir, 0600); err != nil {
-		return nil, xerrors.Errorf("failed to create session dir: %w", err)
+		return xerrors.Errorf("failed to create session dir: %w", err)
 	}
 
 	client := telegram.NewClient(c.Int("tg.app_id"), c.String("tg.app_hash"), telegram.Options{
 		Logger: logger,
-		SessionStorage: &telegram.FileSessionStorage{
+		SessionStorage: &session.FileStorage{
 			Path: filepath.Join(sessionDir, "session.json"),
 		},
 		UpdateHandler: dispatcher.Handle,
 	})
 
-	err := client.Connect(c.Context)
-	if err != nil {
-		return nil, xerrors.Errorf("failed to connect: %w", err)
-	}
-
-	auth, err := client.AuthStatus(c.Context)
-	if err != nil {
-		return nil, xerrors.Errorf("failed to get auth status: %w", err)
-	}
-
-	logger.With(zap.Bool("authorized", auth.Authorized)).Info("Auth status")
-	if !auth.Authorized {
-		if err := client.AuthBot(c.Context, c.String("tg.bot_token")); err != nil {
-			return nil, xerrors.Errorf("failed to perform bot login: %w", err)
+	return client.Run(c.Context, func(ctx context.Context) error {
+		auth, err := client.AuthStatus(c.Context)
+		if err != nil {
+			return xerrors.Errorf("failed to get auth status: %w", err)
 		}
-		logger.Info("Bot login ok")
-	}
 
-	err = client.Ping(c.Context)
-	if err != nil {
-		return nil, xerrors.Errorf("failed to ping: %w", err)
-	}
+		logger.With(zap.Bool("authorized", auth.Authorized)).Info("Auth status")
+		if !auth.Authorized {
+			if err := client.AuthBot(c.Context, c.String("tg.bot_token")); err != nil {
+				return xerrors.Errorf("failed to perform bot login: %w", err)
+			}
+			logger.Info("Bot login ok")
+		}
 
-	return client, nil
+		return cb(c, client)
+	})
 }
 
 func (app *App) run(c *cli.Context) (err error) {
 	dispatcher := tg.NewUpdateDispatcher()
-	client, err := app.createTelegram(c, dispatcher)
-	if err != nil {
-		return err
-	}
-	defer func() {
-		_ = client.Close()
-	}()
-
-	options := tghbot.Options{
-		PollTimeout: c.Duration("bot.poll_timeout"),
-		Template:    nil,
-	}
-	if c.IsSet("bot.template_path") {
-		p, err := filepath.Abs(c.Path("bot.template_path"))
-		if err != nil {
-			return err
+	return app.createTelegram(c, dispatcher, func(c *cli.Context, client *telegram.Client) error {
+		options := tghbot.Options{
+			PollTimeout: c.Duration("bot.poll_timeout"),
+			Template:    nil,
 		}
-		p = filepath.Join(p, "*")
-		options.Template, err = template.ParseGlob(p)
-		if err != nil {
-			return err
+		if c.IsSet("bot.template_path") {
+			p, err := filepath.Abs(c.Path("bot.template_path"))
+			if err != nil {
+				return err
+			}
+			p = filepath.Join(p, "*")
+			options.Template, err = template.ParseGlob(p)
+			if err != nil {
+				return err
+			}
 		}
-	}
 
-	app.bot = tghbot.NewBot(options, client, oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: c.String("gh.token")},
-	), tghbot.WithLogger(app.logger))
-	app.bot.SetupDispatcher(dispatcher)
+		app.bot = tghbot.NewBot(options, client, oauth2.StaticTokenSource(
+			&oauth2.Token{AccessToken: c.String("gh.token")},
+		), tghbot.WithLogger(app.logger))
+		app.bot.SetupDispatcher(dispatcher)
 
-	return app.bot.Run(c.Context)
+		return app.bot.Run(c.Context)
+	})
 }
 
 func (app *App) getEnvNames(names ...string) []string {

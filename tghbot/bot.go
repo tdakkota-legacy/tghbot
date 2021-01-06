@@ -8,11 +8,12 @@ import (
 	"github.com/gotd/td/telegram"
 	"github.com/gotd/td/tg"
 	"github.com/gregjones/httpcache"
-	"github.com/tdakkota/tghbot/tghbot/listener"
-	"github.com/tdakkota/tghbot/tghbot/storage"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"golang.org/x/oauth2"
+
+	"github.com/tdakkota/tghbot/tghbot/listener"
+	"github.com/tdakkota/tghbot/tghbot/storage"
 )
 
 type Bot struct {
