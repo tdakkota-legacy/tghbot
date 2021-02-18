@@ -2,6 +2,7 @@ github.com/BurntSushi/toml v0.3.1 h1:WXkYYl6Yr3qBf1K79EBnL4mak0OimBfB0XUf9Vl28OQ
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/Julusian/godocdown v0.0.0-20170816220326-6d19f8ff2df8/go.mod h1:INZr5t32rG59/5xeltqoCJoNY7e5x/3xoY9WSWVWg74=
 github.com/PuerkitoBio/goquery v1.6.0/go.mod h1:GsLWisAFVj4WgDibEWF4pvYnkVQBpKBKeU+7zCJoLcc=
+github.com/PuerkitoBio/goquery v1.6.1/go.mod h1:GsLWisAFVj4WgDibEWF4pvYnkVQBpKBKeU+7zCJoLcc=
 github.com/andybalholm/cascadia v1.1.0/go.mod h1:GsXiBklL0woXo1j/WYWtSYYC4ouU9PqHO0sqidkEA4Y=
 github.com/cenkalti/backoff/v4 v4.1.0 h1:c8LkOFQTzuO0WBM/ae5HdGQuZPfPxp7lqBRwQRm4fSc=
 github.com/cenkalti/backoff/v4 v4.1.0/go.mod h1:scbssz8iZGpm3xbr14ovlUdkxfGXNInqkPWOWmG2CLw=
@@ -22,12 +23,15 @@ github.com/google/go-querystring v1.0.0 h1:Xkwi/a1rcvNg1PPYe5vI8GbeBY/jrVuDX5ASu
 github.com/google/go-querystring v1.0.0/go.mod h1:odCYkC5MyYFN7vkCjXpyrEuKhc/BUO6wN/zVPAxq5ck=
 github.com/google/renameio v0.1.0/go.mod h1:KWCgfxg9yswjAJkECMjeO8J8rahYeXnNhOm40UhjYkI=
 github.com/gotd/getdoc v0.4.0/go.mod h1:AjLjQ5gdmIptXdjv6lYPHShv5f/dm/poa9wx3Kj/OdM=
+github.com/gotd/getdoc v0.6.0/go.mod h1:6hb7xxoTyjm+v3ZehmKlOiv6Zfodoff36wEhNqrSP+c=
 github.com/gotd/ige v0.1.5 h1:qITql4hZpqPM/DSeO5IVlxzXJxrs4ZZiKRwPif2K76U=
 github.com/gotd/ige v0.1.5/go.mod h1:LbvqjUuGELVuHcKjfJZ2NPNzegICQU4eqrPAkXy0nTs=
 github.com/gotd/neo v0.1.1 h1:R0+UERZZubPcaQbA0sR6n2EV8uy6tt/0SpfUlKfQq+U=
 github.com/gotd/neo v0.1.1/go.mod h1:9A2a4bn9zL6FADufBdt7tZt+WMhvZoc5gWXihOPoiBQ=
 github.com/gotd/td v0.21.1 h1:WbcNpjgMRexJeiyKCK5JCmdyJe0XiT6PPsI06VmlE1o=
 github.com/gotd/td v0.21.1/go.mod h1:zn+ydzY4o4oHDazZTmpcYbUlKfEflI/Gjk4pdt93kQ8=
+github.com/gotd/td v0.24.0 h1:rgpHxX2r6UJtKvUwRiV6jeeX6hZiyWdSGVXrRXnREzQ=
+github.com/gotd/td v0.24.0/go.mod h1:RjW2WN9GH3W819SGcCPLf+7hYbL15hFSKz4DFqtIIXg=
 github.com/gotd/tl v0.3.0/go.mod h1:9xGV9pH5N+LDoNmbeuOor9AjJaQzlj4KP5EguI1LMM8=
 github.com/gotd/xor v0.1.0/go.mod h1:ZTmdgqf6SOHder8/MFp9CNkXIadzID5lIiaZxRZICH0=
 github.com/gotd/xor v0.1.1 h1:LSPEeuf7noTo4fi4PrEsAaWXOSwjsY2e+IINPiR+c7s=
