@@ -4,7 +4,7 @@ go 1.15
 
 require (
 	github.com/google/go-github/v33 v33.0.0
-	github.com/gotd/td v0.21.1
+	github.com/gotd/td v0.29.0
 	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79
 	github.com/stretchr/testify v1.7.0
 	github.com/urfave/cli/v2 v2.3.0
